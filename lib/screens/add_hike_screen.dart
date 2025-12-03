@@ -87,7 +87,20 @@ class _AddHikeScreenState extends State<AddHikeScreen> {
                       safetyTips: _safetyTipsController.text,
                     );
                     DatabaseHelper.instance.addHike(hike);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Add successfully!"),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
                     Navigator.pop(context, true);
+
                   }
                 },
                 child: Text('Add Hike'),

@@ -119,26 +119,91 @@ class _EditHikeScreenState extends State<EditHikeScreen> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final updatedHike = Hike(
-                      id: widget.hike.id, 
-                      name: _nameController.text,
-                      location: _locationController.text,
-                      date: _dateController.text,
-                      parkingAvailable: _parkingController.text,
-                      length: double.parse(_lengthController.text),
-                      difficulty: _difficultyController.text,
-                      description: _descriptionController.text,
-                      weatherConditions: _weatherConditionsController.text,
-                      safetyTips: _safetyTipsController.text,
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          title: Text(
+                            "Confirm Update",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          content: Text(
+                            "Do you want to update the changes?",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
+                          actions: [
+                            TextButton(
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: () => Navigator.pop(context, false),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                              ),
+                              child: Text(
+                                "Update",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(context, true),
+                            ),
+                          ],
+                        );
+                      },
                     );
 
-                    DatabaseHelper.instance.updateHike(updatedHike);
-                    Navigator.pop(
-                      context,
-                      true,
-                    );
+                    if (confirm == true) {
+                      final updatedHike = Hike(
+                        id: widget.hike.id,
+                        name: _nameController.text,
+                        location: _locationController.text,
+                        date: _dateController.text,
+                        parkingAvailable: _parkingController.text,
+                        length: double.parse(_lengthController.text),
+                        difficulty: _difficultyController.text,
+                        description: _descriptionController.text,
+                        weatherConditions: _weatherConditionsController.text,
+                        safetyTips: _safetyTipsController.text,
+                      );
+
+                      await DatabaseHelper.instance.updateHike(updatedHike);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Updated successfully!"),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+
+                      Navigator.pop(context, true);
+
+                    }
                   }
                 },
                 child: Text('Save Changes'),

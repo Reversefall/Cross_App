@@ -44,14 +44,61 @@ class _HikeListScreenState extends State<HikeListScreen> {
                 ),
               );
               if (result != null) {
-                _loadHikes(); 
+                _loadHikes();
               }
             },
             trailing: IconButton(
               icon: Icon(Icons.delete),
               onPressed: () async {
-                await DatabaseHelper.instance.deleteHike(hike.id!);
-                _loadHikes();
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      title: Text(
+                        "Confirm delete",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      content: Text(
+                        "Are you sure you want to delete trip '${hike.name}'?",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
+                      actions: [
+                        TextButton(
+                          child: Text("Cancel", style: TextStyle(fontSize: 16)),
+                          onPressed: () => Navigator.pop(context, false),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                          ),
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ],
+                    );
+                  },
+                );
+                if (confirm == true) {
+                  await DatabaseHelper.instance.deleteHike(hike.id!);
+                  _loadHikes();
+                }
               },
             ),
           );
@@ -64,7 +111,7 @@ class _HikeListScreenState extends State<HikeListScreen> {
             MaterialPageRoute(builder: (context) => AddHikeScreen()),
           );
           if (result != null) {
-            _loadHikes(); 
+            _loadHikes();
           }
         },
         child: Icon(Icons.add),
